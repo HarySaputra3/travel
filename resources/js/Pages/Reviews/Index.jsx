@@ -1,5 +1,6 @@
 import React from "react";
 
+import hasAnyPermission from "@/Utils/Permissions";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import Container from "@/Components/Container";
 import Table from "@/Components/Table";
@@ -7,9 +8,8 @@ import Button from "@/Components/Button";
 import Pagination from "@/Components/Pagination";
 import { Head, usePage } from "@inertiajs/react";
 import Search from "@/Components/Search";
-import hasAnyPermission from "@/Utils/Permissions";
 
-// Komponen Rating Bintang ⭐
+// Komponen Rating Bintang
 const RatingStars = ({ rating, max = 5 }) => {
     const filledStars = "⭐".repeat(rating);
     const emptyStars = "☆".repeat(max - rating);
@@ -22,9 +22,7 @@ const RatingStars = ({ rating, max = 5 }) => {
 };
 
 export default function Index({ auth }) {
-    const { reviews, filters, can } = usePage().props;
-
-    const isAdmin = auth.user.role.includes("admin");
+    const { reviews, filters } = usePage().props;
 
     return (
         <AuthenticatedLayout
@@ -39,14 +37,14 @@ export default function Index({ auth }) {
             <Container>
                 <div className="mb-4 flex items-center justify-between gap-4">
                     {hasAnyPermission(["reviews create"]) && (
-                        <Button type="add" url={route("reviews.create")} />
+                        <Button type={"add"} url={route(["reviews.create"])} />
                     )}
 
                     <div className="w-full md:w-4.6">
                         <Search
                             url={route("reviews.index")}
                             placeholder="Search reviews data by name..."
-                            filter={filters}
+                            filters={filters}
                         />
                     </div>
                 </div>
@@ -69,81 +67,98 @@ export default function Index({ auth }) {
                             </tr>
                         </Table.Thead>
                         <Table.Tbody>
-                            {reviews.data.map((review, i) => (
-                                <tr key={i}>
-                                    <Table.Td>
-                                        {i +
-                                            1 +
-                                            (reviews.current_page - 1) *
-                                                reviews.per_page}
-                                    </Table.Td>
-                                    <Table.Td>{review.user.name}</Table.Td>
-                                    <Table.Td>{review.location.title}</Table.Td>
-                                    <Table.Td>
-                                        {review.transaction.code}
-                                    </Table.Td>
+                            {reviews.data.length > 0 ? (
+                                reviews.data.map((review, i) => (
+                                    <tr key={i}>
+                                        <Table.Td>
+                                            {i +
+                                                1 +
+                                                (reviews.current_page - 1) *
+                                                    reviews.per_page}
+                                        </Table.Td>
+                                        <Table.Td>{review.user.name}</Table.Td>
+                                        <Table.Td>
+                                            {review.location.title}
+                                        </Table.Td>
+                                        <Table.Td>
+                                            {review.transaction.code}
+                                        </Table.Td>
 
-                                    <Table.Td>
-                                        <RatingStars
-                                            rating={review.rate_kebersihan}
-                                        />
-                                    </Table.Td>
-                                    <Table.Td>
-                                        <RatingStars
-                                            rating={review.rate_keakuratan}
-                                        />
-                                    </Table.Td>
-                                    <Table.Td>
-                                        <RatingStars
-                                            rating={review.rate_checkin}
-                                        />
-                                    </Table.Td>
-                                    <Table.Td>
-                                        <RatingStars
-                                            rating={review.rate_komunikasi}
-                                        />
-                                    </Table.Td>
-                                    <Table.Td>
-                                        <RatingStars
-                                            rating={review.rate_lokasi}
-                                        />
-                                    </Table.Td>
-                                    <Table.Td>
-                                        <RatingStars
-                                            rating={review.rate_nilaiekonomis}
-                                        />
-                                    </Table.Td>
-                                    <Table.Td>
-                                        <div className="flex items-center gap-2">
-                                            {can?.edit([
-                                                "reviews edit",
-                                            ]) && (
-                                                <Button
-                                                    type={"edit"}
-                                                    url={route(
-                                                        "reviews.edit",
-                                                        review.id
-                                                    )}
-                                                />
-                                            )}
-                                            {can?.edit([
-                                                "reviews delete",
-                                            ]) && (
-                                                <Button
-                                                    type={"delete"}
-                                                    url={route(
-                                                        "reviews.create",
-                                                        review.id
-                                                    )}
-                                                />
-                                            )}
-                                        </div>
+                                        <Table.Td>
+                                            <RatingStars
+                                                rating={review.rate_kebersihan}
+                                            />
+                                        </Table.Td>
+                                        <Table.Td>
+                                            <RatingStars
+                                                rating={review.rate_keakuratan}
+                                            />
+                                        </Table.Td>
+                                        <Table.Td>
+                                            <RatingStars
+                                                rating={review.rate_checkin}
+                                            />
+                                        </Table.Td>
+                                        <Table.Td>
+                                            <RatingStars
+                                                rating={review.rate_komunikasi}
+                                            />
+                                        </Table.Td>
+                                        <Table.Td>
+                                            <RatingStars
+                                                rating={review.rate_lokasi}
+                                            />
+                                        </Table.Td>
+                                        <Table.Td>
+                                            <RatingStars
+                                                rating={
+                                                    review.rate_nilaiekonomis
+                                                }
+                                            />
+                                        </Table.Td>
+                                        <Table.Td>
+                                            <div className="flex items-center gap-2">
+                                                {hasAnyPermission([
+                                                    "reviews edit",
+                                                ]) && (
+                                                    <Button
+                                                        type={"edit"}
+                                                        url={route(
+                                                            "reviews.edit",
+                                                            review.id
+                                                        )}
+                                                    />
+                                                )}
+
+                                                {hasAnyPermission([
+                                                    "reviews delete",
+                                                ]) && (
+                                                    <Button
+                                                        type={"delete"}
+                                                        url={route(
+                                                            "reviews.destroy",
+                                                            review.id
+                                                        )}
+                                                    />
+                                                )}
+                                            </div>
+                                        </Table.Td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <Table.Td
+                                        colSpan={11}
+                                        className="text-center text-gray-500"
+                                    >
+                                        No reviews found.
                                     </Table.Td>
                                 </tr>
-                            ))}
+                            )}
                         </Table.Tbody>
                     </Table>
                 </Table.Card>
+
                 <div className="flex items-center justify-center">
                     {reviews.last_page !== 1 && (
                         <Pagination links={reviews.links} />

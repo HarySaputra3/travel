@@ -18,18 +18,18 @@ class TicketController extends Controller implements HasMiddleware
             new Middleware('permission:tickets delete', only: ['destroy'])
         ];
     }
+
     public function index(Request $request)
     {
         $tickets = Ticket::select('id', 'ticket_code', 'name', 'price_per_pack', 'qty')
             ->when($request->search, fn($query) => $query->where('ticket_code', 'like', '%' . $request->search . '%'))
-            ->latest()
+            // FIX: Mengurutkan berdasarkan ID terbaru lebih baik daripada `latest()` jika tidak ada timestamp
+            ->orderBy('id', 'desc')
             ->paginate(5)
             ->withQueryString();
 
-        //konversi path gambar url agar bisa ditampilkan di tabel
-        foreach ($tickets as $ticket) {
-            $ticket->image_url = $ticket->image ? asset('storage/' . $ticket->image) : null;
-        }
+        // FIX: Perulangan ini tidak perlu dan bisa menyebabkan error jika kolom 'image' tidak di-select.
+        // Dihapus karena tidak digunakan di frontend.
 
         return inertia('Tickets/Index', [
             'tickets' => $tickets,
@@ -37,17 +37,11 @@ class TicketController extends Controller implements HasMiddleware
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return inertia('Tickets/Create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -63,21 +57,20 @@ class TicketController extends Controller implements HasMiddleware
             'qty' => $request->qty,
         ]);
 
-        return to_route('tickets.index')->with('success', 'Tiket Berhasil ditambahkan');
+        return to_route('tickets.index')->with('success', 'Ticket created successfully');
     }
 
     public function edit(Ticket $ticket)
     {
-        return inertia('Ticket/Edit', ['ticket' => $ticket]);
+        // FIX: Path view harusnya 'Tickets/Edit' (plural) sesuai konvensi.
+        return inertia('Tickets/Edit', ['ticket' => $ticket]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Ticket $ticket)
     {
         $request->validate([
-            'name' => 'required|in:regularVIP',
+            // FIX: Aturan validasi `in` harus dipisah dengan koma.
+            'name' => 'required|in:Regular,VIP',
             'price_per_pack' => 'required|integer|min:0',
             'qty' => 'required|integer|min:1'
         ]);
@@ -88,16 +81,12 @@ class TicketController extends Controller implements HasMiddleware
             'qty' => $request->qty,
         ]);
 
-        return to_route('tickets.index')->with('success', 'Tiket berhasil di perbarui');
+        return to_route('tickets.index')->with('success', 'Ticket updated successfully');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Ticket $ticket)
     {
         $ticket->delete();
-
-        return back()->with('success', 'Tiket berhasil di hapus');
+        return back()->with('success', 'Ticket deleted successfully');
     }
 }

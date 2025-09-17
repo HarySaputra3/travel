@@ -1,30 +1,39 @@
+import React from "react";
+import { useForm, usePage, Head } from "@inertiajs/react";
+import Swal from "sweetalert2";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import Container from "@/Components/Container";
+import Card from "@/Components/Card";
+import Input from "@/Components/Input";
 import Button from "@/Components/Button";
 import Checkbox from "@/Components/Checkbox";
-import Input from "@/Components/Input";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { useForm, usePage, Head } from "@inertiajs/react";
-import React from "react";
-import Swal from "sweetalert2";
 
 export default function Create({ auth }) {
-    // destruct permission from usePage().props
+    // ambil permissions dari props
     const { permissions } = usePage().props;
 
-    // define state with helper inertia
-    const { data, setData, post, errors, processing } = useForm({
+    // state form inertia
+    const { data, setData, post, errors } = useForm({
         name: "",
         selectedPermissions: [],
     });
 
-    // define method handleSelectedPermissions
+    // handle checkbox
     const handleSelectedPermissions = (e) => {
-        let items = data.selectedPermissions;
-        items.push(e.target.value);
-        setData("selectedPermissions", items);
+        const value = e.target.value;
+        let updated = [...data.selectedPermissions];
+
+        if (updated.includes(value)) {
+            updated = updated.filter((item) => item !== value);
+        } else {
+            updated.push(value);
+        }
+
+        setData("selectedPermissions", updated);
     };
 
-    // define method handleStoreData`
-    const handleStoreData = async (e) => {
+    // store data
+    const handleStoreData = (e) => {
         e.preventDefault();
 
         post(route("roles.store"), {
@@ -49,13 +58,14 @@ export default function Create({ auth }) {
                 </h2>
             }
         >
-            <Head title={"Create Role"} />
+            <Head title="Create Role" />
+
             <Container>
-                <Card title={"Create new role"}>
+                <Card title="Create new role">
                     <form onSubmit={handleStoreData}>
-                        <div className="mb-4 ">
+                        <div className="mb-4">
                             <Input
-                                label={"Role Name"}
+                                label="Role Name"
                                 type="text"
                                 value={data.name}
                                 onChange={(e) =>
@@ -65,6 +75,7 @@ export default function Create({ auth }) {
                                 placeholder="Input role name..."
                             />
                         </div>
+
                         <div className="mb-4">
                             <div className="grid grid-cols-2 gap-4">
                                 {Object.entries(permissions).map(
@@ -80,32 +91,32 @@ export default function Create({ auth }) {
                                                 {permissionItems.map(
                                                     (permission) => (
                                                         <Checkbox
+                                                            key={permission}
                                                             label={permission}
                                                             value={permission}
                                                             onChange={
                                                                 handleSelectedPermissions
                                                             }
-                                                            key={permission}
                                                         />
                                                     )
                                                 )}
                                             </div>
-                                            {errors?.selectedPermissions && (
-                                                <div className="text-xs text-red-500 mt-4">
-                                                    {errors.selectedPermissions}
-                                                </div>
-                                            )}
                                         </div>
                                     )
                                 )}
                             </div>
-                            <div className="flex items-center gap-2">
-                                <Button type={"submit"} />
-                                <Button
-                                    type={"cancel"}
-                                    url={route("roles.index")}
-                                />
-                            </div>
+                            {errors?.selectedPermissions && (
+                                <div className="text-xs text-red-500 mt-2">
+                                    {errors.selectedPermissions}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <Button type="submit">Save</Button>
+                            <Button type="cancel" url={route("roles.index")}>
+                                Cancel
+                            </Button>
                         </div>
                     </form>
                 </Card>

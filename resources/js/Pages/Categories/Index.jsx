@@ -1,5 +1,4 @@
 import React from "react";
-
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import Container from "@/Components/Container";
 import Table from "@/Components/Table";
@@ -10,7 +9,7 @@ import Search from "@/Components/Search";
 import hasAnyPermission from "@/Utils/Permissions";
 
 export default function Index({ auth }) {
-    //destruct categories props
+    // Destruct categories props
     const { categories, filters } = usePage().props;
 
     return (
@@ -18,18 +17,17 @@ export default function Index({ auth }) {
             user={auth.user}
             header={
                 <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    categories
+                    Categories
                 </h2>
             }
         >
-            <Head title="categories" />
+            <Head title="Categories" />
             <Container>
                 <div className="mb-4 flex items-center justify-between gap-4">
                     {hasAnyPermission(["categories create"]) && (
                         <Button type="add" url={route("categories.create")} />
                     )}
-
-                    <div className="w-full md:w-4.6">
+                    <div className="w-full md:w-4/6">
                         <Search
                             url={route("categories.index")}
                             placeholder="Search categories data by name..."
@@ -38,19 +36,20 @@ export default function Index({ auth }) {
                     </div>
                 </div>
 
-                <Table.Card title={"categories"}>
+                <Table.Card title={"Categories"}>
                     <Table>
                         <Table.Thead>
                             <tr>
                                 <Table.Th>#</Table.Th>
-                                <Table.Th>Categories Name</Table.Th>
+                                <Table.Th>Category Name</Table.Th>
                                 <Table.Th>Image</Table.Th>
                                 <Table.Th>Action</Table.Th>
                             </tr>
                         </Table.Thead>
                         <Table.Tbody>
                             {categories.data.map((category, i) => (
-                                <tr key={i}>
+                                // FIX: Gunakan ID unik untuk key
+                                <tr key={category.id}>
                                     <Table.Td>
                                         {i +
                                             1 +
@@ -78,10 +77,11 @@ export default function Index({ auth }) {
                                             ]) && (
                                                 <Button
                                                     type={"edit"}
-                                                    url={route([
+                                                    // FIX: Hapus kurung siku `[]` yang tidak perlu
+                                                    url={route(
                                                         "categories.edit",
-                                                        category.id,
-                                                    ])}
+                                                        category.id
+                                                    )}
                                                 />
                                             )}
                                             {hasAnyPermission([
@@ -89,8 +89,9 @@ export default function Index({ auth }) {
                                             ]) && (
                                                 <Button
                                                     type={"delete"}
+                                                    // FIX: Route diarahkan ke `destroy`, bukan `create`
                                                     url={route(
-                                                        "categories.create",
+                                                        "categories.destroy",
                                                         category.id
                                                     )}
                                                 />
@@ -102,7 +103,7 @@ export default function Index({ auth }) {
                         </Table.Tbody>
                     </Table>
                 </Table.Card>
-                <div className="flex items-center justify-center">
+                <div className="flex items-center justify-center mt-4">
                     {categories.last_page !== 1 && (
                         <Pagination links={categories.links} />
                     )}

@@ -8,14 +8,14 @@ import Button from "@/Components/Button";
 import Card from "@/Components/Card";
 import Swal from "sweetalert2";
 
-export default function Create({auth}) {
-    //define state  with helper  inertia
-    const { data, setData, post, errors } = useForm({
+export default function Create({ auth }) {
+    // state inertia form
+    const { data, setData, post, processing, errors, reset } = useForm({
         name: "",
     });
 
-    //define method handleStoreData
-    const handleStoreData = async (e) => {
+    // handle simpan data
+    const handleStoreData = (e) => {
         e.preventDefault();
 
         post(route("permissions.store"), {
@@ -27,28 +27,29 @@ export default function Create({auth}) {
                     showConfirmButton: false,
                     timer: 1500,
                 });
+                reset(); // reset form setelah sukses
             },
         });
     };
 
     return (
         <AuthenticatedLayout
-            user={auth.auth.user}
+            user={auth.user}
             header={
                 <h2 className="font-semibold text-xl text-gray-800 leading-tight">
                     Create Permission
                 </h2>
             }
         >
-            <Head title={"Create Permissions"} />
+            <Head title="Create Permissions" />
 
             <Container>
                 <Card title="Create new permission">
                     <form onSubmit={handleStoreData}>
                         <div className="mb-4">
                             <Input
-                                label={"Permission Name"}
-                                type={"text"}
+                                label="Permission Name"
+                                type="text"
                                 value={data.name}
                                 onChange={(e) =>
                                     setData("name", e.target.value)
@@ -58,9 +59,9 @@ export default function Create({auth}) {
                             />
                         </div>
                         <div className="flex items-center gap-2">
-                            <Button type={"submit"} />
+                            <Button type="submit" disabled={processing} />
                             <Button
-                                type={"cancel"}
+                                type="cancel"
                                 url={route("permissions.index")}
                             />
                         </div>

@@ -4,16 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Reviews extends Model
 {
     use HasFactory;
-    protected $table= 'reviews';
+
+    protected $table = 'reviews';
+
     protected $fillable = [
         'user_id',
-        'trasaction_id',
-        // 'review',
+        'transaction_id',
         'location_id',
+        'review',
         'rate_kebersihan',
         'rate_keakuratan',
         'rate_checkin',
@@ -21,13 +24,19 @@ class Reviews extends Model
         'rate_lokasi',
         'rate_nilaiekonomis',
     ];
-    public function user(){
+
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class, 'user_id');
     }
-    public function location(){
+
+    public function location(): BelongsTo
+    {
         return $this->belongsTo(Locations::class, 'location_id');
     }
-    public function transaction (){
+
+    public function transaction(): BelongsTo
+    {
         return $this->belongsTo(Transaction::class, 'transaction_id');
     }
 }

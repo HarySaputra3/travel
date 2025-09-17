@@ -1,5 +1,4 @@
 import React from "react";
-
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import Container from "@/Components/Container";
 import { Head, useForm, usePage } from "@inertiajs/react";
@@ -10,41 +9,38 @@ import Swal from "sweetalert2";
 import Select2 from "@/Components/Select2";
 
 export default function Edit({ auth }) {
-    //destruct roles and users from usepage() props
     const { user, roles } = usePage().props;
-    //define state with helper inertia
+
     const { data, setData, post, errors } = useForm({
         name: user.name,
         email: user.email,
         phone: user.phone,
-        selectedRoles: user.roles.map((role) => role.name), // Filter roles to map selected role
-        filterRole: user.roles.map((role) => ({
-            value: role.name,
-            label: role.name,
-        })),
+        selectedRoles: user.roles.map((role) => role.name),
         _method: "put",
     });
 
-    // Define formattedRoles from roles map
     const formattedRoles = roles.map((role) => ({
         value: role.name,
         label: role.name,
     }));
 
-    // Define method handleSelectedRoles
+    const defaultRoles = user.roles.map((role) => ({
+        value: role.name,
+        label: role.name,
+    }));
+
     const handleSelectedRoles = (selected) => {
         const selectedValues = selected.map((option) => option.value);
         setData("selectedRoles", selectedValues);
     };
 
-    // Define method handleUpdateData
-    const handleUpdateData = async (e) => {
+    const handleUpdateData = (e) => {
         e.preventDefault();
         post(route("users.update", user.id), {
             onSuccess: () => {
                 Swal.fire({
                     title: "Success!",
-                    text: "Data updated successfully!",
+                    text: "User updated successfully!",
                     icon: "success",
                     showConfirmButton: false,
                     timer: 1500,
@@ -62,10 +58,10 @@ export default function Edit({ auth }) {
                 </h2>
             }
         >
-            <Head title={"Create Users"} />
+            <Head title="Edit User" />
 
             <Container>
-                <Card title={"Create new user"}>
+                <Card title="Edit user">
                     <form onSubmit={handleUpdateData}>
                         <div className="mb-4">
                             <Input
@@ -89,7 +85,7 @@ export default function Edit({ auth }) {
                                     setData("email", e.target.value)
                                 }
                                 errors={errors.email}
-                                placeholder="Input email user..."
+                                placeholder="Input email..."
                             />
                         </div>
 
@@ -102,7 +98,7 @@ export default function Edit({ auth }) {
                                     setData("phone", e.target.value)
                                 }
                                 errors={errors.phone}
-                                placeholder="Input phone user..."
+                                placeholder="Input phone..."
                             />
                         </div>
 
@@ -110,19 +106,24 @@ export default function Edit({ auth }) {
                             <div className="flex items-center gap-2 text-sm text-gray-700">
                                 Roles
                             </div>
-                            <Selected2 onChange={handleSelectedRoles} option={formattedRoles} placeholder='Choose role...' />
-                        </div> 
+                            <Select2
+                                onChange={handleSelectedRoles}
+                                options={formattedRoles}
+                                defaultValue={defaultRoles}
+                                placeholder="Choose role..."
+                            />
+                        </div>
 
                         <div className="mb-4">
                             <Input
                                 label="Password"
                                 type="password"
-                                value={data.password}
+                                value={data.password || ""}
                                 onChange={(e) =>
                                     setData("password", e.target.value)
                                 }
                                 errors={errors.password}
-                                placeholder="Input password"
+                                placeholder="Input password (leave blank if unchanged)"
                             />
                         </div>
 
@@ -130,7 +131,7 @@ export default function Edit({ auth }) {
                             <Input
                                 label="Password Confirmation"
                                 type="password"
-                                value={data.password_confirmation}
+                                value={data.password_confirmation || ""}
                                 onChange={(e) =>
                                     setData(
                                         "password_confirmation",
@@ -138,12 +139,16 @@ export default function Edit({ auth }) {
                                     )
                                 }
                                 errors={errors.password_confirmation}
-                                placeholder="Input password confirmation..."
+                                placeholder="Confirm password..."
                             />
                         </div>
 
-                        <Button type={'Submit'} />
-                        <Button type={'cancel'} url={route('users/index')} />
+                        <div className="flex items-center gap-2">
+                            <Button type="submit">Update</Button>
+                            <Button type="cancel" url={route("users.index")}>
+                                Cancel
+                            </Button>
+                        </div>
                     </form>
                 </Card>
             </Container>

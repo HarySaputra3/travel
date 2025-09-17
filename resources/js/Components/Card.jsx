@@ -1,9 +1,9 @@
 import React from "react";
 
-export default function Card() {
+export default function Card({ className = "", title, children }) {
     return (
         <>
-            <div className={`p-4 rounded-t-lg ${className} bg-white`}>
+            <div className={`p-4 rounded-t-lg bg-white ${className}`}>
                 <div className="flex items-center gap-2 font-semibold text-sm text-gray-700 capitalize">
                     {title}
                 </div>

@@ -1,5 +1,4 @@
 import React from "react";
-
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import Container from "@/Components/Container";
 import { Head, useForm, usePage } from "@inertiajs/react";
@@ -11,45 +10,43 @@ import Swal from "sweetalert2";
 export default function Edit({ auth }) {
     const { ticket } = usePage().props;
 
-    const { data, setData, post, errors, processing } = useForm({
+    // FIX: Gunakan `put` untuk update, dan sesuaikan nama state `price_per_pack`
+    const { data, setData, put, errors, processing } = useForm({
         name: ticket.name,
         qty: ticket.qty,
-        price: ticket.price_per_pack,
-        __method: "put",
+        price_per_pack: ticket.price_per_pack, // FIX: Nama state disesuaikan
     });
 
     const handleUpdateData = (e) => {
         e.preventDefault();
-
-        post(
-            route("tickets.update", {
-                onSuccess: () => {
-                    Swal.fire({
-                        title: "success!",
-                        text: "Tiket berhasil ditambahkan!",
-                        icon: "success",
-                        showConfirmButton: false,
-                        timer: 1500,
-                    });
-                },
-            })
-        );
+        // FIX: Panggil route update dengan ID tiket dan gunakan method `put`
+        put(route("tickets.update", ticket.id), {
+            onSuccess: () => {
+                Swal.fire({
+                    title: "Success!",
+                    text: "Ticket updated successfully!",
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
+            },
+        });
     };
+
     return (
         <AuthenticatedLayout
-            user={auth.auth.user}
+            user={auth.user} // FIX: Seharusnya auth.user, bukan auth.auth.user
             header={
                 <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Edit Tickets
+                    Edit Ticket
                 </h2>
             }
         >
-            <Head title={"Create Tickets"} />
-
+            <Head title={"Edit Ticket"} /> {/* FIX: Judul disesuaikan */}
             <Container>
                 <Card title="Edit Ticket">
                     <form onSubmit={handleUpdateData}>
-                        {/*pilihan jenis tiket*/}
+                        {/* Pilihan jenis tiket */}
                         <div className="mb-4">
                             <label className="block font-medium text-sm text-gray-700">
                                 Ticket Type
@@ -71,51 +68,45 @@ export default function Edit({ auth }) {
                             )}
                         </div>
 
-                        {/*input harga tiket*/}
+                        {/* Input harga tiket */}
                         <div className="mb-4">
                             <Input
                                 label="Price (Rp)"
                                 type="number"
-                                value={data.price_per_pack}
-                                onChange={(e) =>
-                                    setData(
-                                        "price_per_pack",
-                                        e.target.value
-                                            ? parseFloat(e.target.value)
-                                            : 0
-                                    )
+                                value={data.price_per_pack} // FIX: Disesuaikan dengan state
+                                onChange={
+                                    (e) =>
+                                        setData(
+                                            "price_per_pack",
+                                            e.target.value
+                                        ) // FIX: Disesuaikan dengan state
                                 }
-                                errors={errors.price_per_pack}
+                                errors={errors.price_per_pack} // FIX: Disesuaikan dengan state
                                 placeholder="Enter ticket price..."
                             />
                         </div>
 
-                        {/*input jumlah tiket*/}
+                        {/* Input jumlah tiket */}
                         <div className="mb-4">
                             <Input
-                                label="Qty"
+                                label="Quantity"
                                 type="number"
                                 value={data.qty}
-                                onChange={(e) =>
-                                    setData(
-                                        "qty",
-                                        e.target.value
-                                            ? parseInt(e.target.value)
-                                            : 0
-                                    )
-                                }
+                                onChange={(e) => setData("qty", e.target.value)}
                                 errors={errors.qty}
                                 placeholder="Enter ticket quantity..."
                             />
                         </div>
 
                         <div className="flex items-center gap-2">
-                            <Button type={"submit"}>save</Button>
+                            <Button type={"submit"} disabled={processing}>
+                                Save
+                            </Button>
                             <Button
-                                type={"button"}
+                                type={"cancel"}
                                 url={route("tickets.index")}
                             >
-                                cancel
+                                Cancel
                             </Button>
                         </div>
                     </form>

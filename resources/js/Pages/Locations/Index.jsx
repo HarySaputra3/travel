@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import Container from "@/Components/Container";
 import Table from "@/Components/Table";
@@ -10,11 +9,41 @@ import Search from "@/Components/Search";
 import hasAnyPermission from "@/Utils/Permissions";
 
 export default function Index({ auth }) {
-    // destruct props
     const { locations, filters } = usePage().props;
-
-    // state for preview image
     const [selectedImage, setSelectedImage] = useState(null);
+
+    // Komponen kecil untuk menampilkan gambar yang tumpang tindih
+    const ImageStack = ({ images }) => {
+        if (!images) {
+            return <span className="text-gray-500">No Image</span>;
+        }
+
+        const imageArray = images.split("|");
+        const maxVisible = 3; // Tampilkan maksimal 3 gambar
+        const visibleImages = imageArray.slice(0, maxVisible);
+        const remainingCount = imageArray.length - maxVisible;
+
+        return (
+            <div className="flex items-center">
+                {visibleImages.map((img, idx) => (
+                    <img
+                        key={idx}
+                        onClick={() => setSelectedImage(`/storage/${img}`)}
+                        className={`h-10 w-10 rounded-full border-2 border-white object-cover dark:border-gray-800 ${
+                            idx > 0 ? "-ml-3" : "" // Terapkan margin negatif untuk tumpang tindih
+                        } cursor-pointer hover:z-10 transition-transform hover:scale-110`}
+                        src={`/storage/${img}`}
+                        alt={`Location Image ${idx + 1}`}
+                    />
+                ))}
+                {remainingCount > 0 && (
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-gray-200 text-xs font-semibold text-gray-600 dark:border-gray-800 -ml-3">
+                        +{remainingCount}
+                    </div>
+                )}
+            </div>
+        );
+    };
 
     return (
         <AuthenticatedLayout
@@ -31,8 +60,7 @@ export default function Index({ auth }) {
                     {hasAnyPermission(["locations create"]) && (
                         <Button type="add" url={route("locations.create")} />
                     )}
-
-                    <div className="w-full md:w-4.6">
+                    <div className="w-full md:w-4/6">
                         <Search
                             url={route("locations.index")}
                             placeholder="Search locations data by name..."
@@ -52,8 +80,6 @@ export default function Index({ auth }) {
                                 <Table.Th>Office Hours</Table.Th>
                                 <Table.Th>Phone</Table.Th>
                                 <Table.Th>Address</Table.Th>
-                                <Table.Th>Latitude</Table.Th>
-                                <Table.Th>Longitude</Table.Th>
                                 <Table.Th>Category</Table.Th>
                                 <Table.Th>Ticket Code</Table.Th>
                                 <Table.Th>Action</Table.Th>
@@ -61,7 +87,7 @@ export default function Index({ auth }) {
                         </Table.Thead>
                         <Table.Tbody>
                             {locations.data.map((location, i) => (
-                                <tr key={i}>
+                                <tr key={location.id}>
                                     <Table.Td>
                                         {i +
                                             1 +
@@ -69,46 +95,23 @@ export default function Index({ auth }) {
                                                 locations.per_page}
                                     </Table.Td>
                                     <Table.Td>{location.title}</Table.Td>
+
+                                    {/* REVISI: Tampilan Gambar Diubah di Sini */}
                                     <Table.Td>
-                                        {location.image ? (
-                                            <div className="flex flex-col gap-2">
-                                                {location.image
-                                                    .split("|")
-                                                    .map((img, idx) => (
-                                                        <img
-                                                            key={idx}
-                                                            src={`/storage/${img}`}
-                                                            alt={`Image ${
-                                                                idx + 1
-                                                            }`}
-                                                            className="w-16 h-16 object-cover rounded cursor-pointer hover:opacity-75 transition"
-                                                            onClick={() =>
-                                                                setSelectedImage(
-                                                                    `/storage/${img}`
-                                                                )
-                                                            }
-                                                        />
-                                                    ))}
-                                            </div>
-                                        ) : (
-                                            <span className="text-gray-500">
-                                                No Image
-                                            </span>
-                                        )}
+                                        <ImageStack images={location.image} />
                                     </Table.Td>
 
                                     <Table.Td>
                                         <div
+                                            className="prose max-w-none"
                                             dangerouslySetInnerHTML={{
                                                 __html: location.description,
                                             }}
                                         />
                                     </Table.Td>
-                                    <Table.Td>{location.officeHours}</Table.Td>
+                                    <Table.Td>{location.officehours}</Table.Td>
                                     <Table.Td>{location.phone}</Table.Td>
                                     <Table.Td>{location.address}</Table.Td>
-                                    <Table.Td>{location.latitude}</Table.Td>
-                                    <Table.Td>{location.longitude}</Table.Td>
                                     <Table.Td>
                                         {location.category
                                             ? location.category.name
@@ -119,7 +122,6 @@ export default function Index({ auth }) {
                                             ? location.ticket.ticket_code
                                             : "N/A"}
                                     </Table.Td>
-
                                     <Table.Td>
                                         <div className="flex items-center gap-2">
                                             {hasAnyPermission([
@@ -151,14 +153,13 @@ export default function Index({ auth }) {
                         </Table.Tbody>
                     </Table>
                 </Table.Card>
-                <div className="flex items-center justify-center">
+                <div className="flex items-center justify-center mt-4">
                     {locations.last_page !== 1 && (
                         <Pagination links={locations.links} />
                     )}
                 </div>
             </Container>
 
-            {/* Modal Image Preview */}
             {selectedImage && (
                 <div
                     className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
@@ -175,7 +176,7 @@ export default function Index({ auth }) {
                         />
                         <button
                             onClick={() => setSelectedImage(null)}
-                            className="absolute top-2 right-2 bg-red-600 text-white rounded-full px-2 py-1 shadow-lg"
+                            className="absolute top-2 right-2 bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
                         >
                             ✕
                         </button>

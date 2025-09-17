@@ -1,58 +1,54 @@
 import React from "react";
 
-const Card = ({ title, className, children }) => {
+const Card = ({ title, className = "", children }) => {
     return (
-        <>
-            <div className={`p-4 rounded-t-lg border ${className} bg-white`}>
-                <div className="flex items-center gap-2 font-semibold text-sm text-gray-700 uppercase">
+        <div
+            className={`bg-white border rounded-lg overflow-hidden ${className}`}
+        >
+            <div className="p-4 border-b">
+                <h3 className="flex items-center gap-2 font-semibold text-sm text-gray-700 uppercase">
                     {title}
-                </div>
-                <div className="bg-white rounded-b-lg border-t-0"></div>
+                </h3>
             </div>
-        </>
+            <div className="w-full overflow-x-auto">{children}</div>
+        </div>
     );
 };
 
 const Table = ({ children }) => {
+    return <table className="w-full text-sm border-collapse">{children}</table>;
+};
+
+const Thead = ({ className = "", children }) => {
     return (
-        <>
-            <div className=" w-full overflow-hidden overflow-x-auto border-collapse rounded-b-lg border border-t-0">
-                <table className="w-full text-sm">{children}</table>
-            </div>
-        </>
+        <thead className={`border-b bg-gray-50 ${className}`}>{children}</thead>
     );
 };
 
-const Thead = ({ className, children }) => {
+const Tbody = ({ className = "", children }) => {
     return (
-        <thead className={`${className} border-b bg-gray-50`}>{children}</thead>
+        <tbody className={`divide-y bg-white ${className}`}>{children}</tbody>
     );
 };
 
-const Tbody = ({ className, children }) => {
-    return (
-        <tbody className={`${className} divide-y bg-white`}>{children}</tbody>
-    );
-};
-
-const Td = ({ className, children }) => {
-    return (
-        <td
-            className={`${className} whitespace-nowrap p-4 align-middle text-gray-700`}
-        >
-            {children}
-        </td>
-    );
-};
-
-const Th = ({ className, children }) => {
+const Th = ({ className = "", children }) => {
     return (
         <th
             scope="col"
-            className={`${className} h-12 px-4 text-left align-middle font-medium text-gray-700`}
+            className={`h-12 px-4 text-left align-middle font-medium text-gray-700 ${className}`}
         >
             {children}
         </th>
+    );
+};
+
+const Td = ({ className = "", children }) => {
+    return (
+        <td
+            className={`whitespace-nowrap p-4 align-middle text-gray-700 ${className}`}
+        >
+            {children}
+        </td>
     );
 };
 
@@ -60,20 +56,21 @@ const Empty = ({ colSpan, message, children }) => {
     return (
         <tr>
             <td colSpan={colSpan}>
-                <div className="flex items-center justify-center h-96">
+                <div className="flex flex-col items-center justify-center h-96 text-gray-500">
                     {children}
-                    <div className="mt-5">{message}</div>
+                    <p className="mt-3">{message}</p>
                 </div>
             </td>
         </tr>
     );
 };
 
+// export modular
 Table.Card = Card;
 Table.Thead = Thead;
 Table.Tbody = Tbody;
-Table.Td = Td;
 Table.Th = Th;
+Table.Td = Td;
 Table.Empty = Empty;
 
 export default Table;

@@ -76,7 +76,7 @@ export default function Index({ auth }) {
                                                 <Button
                                                     type={"delete"}
                                                     url={route(
-                                                        "permissions.create",
+                                                        "permissions.destroy",
                                                         permission.id
                                                     )}
                                                 />

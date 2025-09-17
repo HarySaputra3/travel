@@ -1,5 +1,4 @@
 import React from "react";
-
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import Container from "@/Components/Container";
 import { Head, useForm } from "@inertiajs/react";
@@ -10,44 +9,40 @@ import Swal from "sweetalert2";
 
 export default function Create({ auth }) {
     const { data, setData, post, errors, processing } = useForm({
-        name: "",
-        qty: "",
+        name: "Regular", // Nilai default
         price_per_pack: "",
+        qty: "",
     });
 
-    const handleCreateData = (e) => {
+    const handleStoreData = (e) => {
         e.preventDefault();
-
-        post(
-            route("tickets.store", {
-                onSuccess: () => {
-                    Swal.fire({
-                        title: "success!",
-                        text: "Tiket berhasil ditambahkan!",
-                        icon: "success",
-                        showConfirmButton: false,
-                        timer: 1500,
-                    });
-                },
-            })
-        );
+        post(route("tickets.store"), {
+            onSuccess: () => {
+                Swal.fire({
+                    title: "Success!",
+                    text: "Ticket created successfully!",
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
+            },
+        });
     };
 
     return (
         <AuthenticatedLayout
-            user={auth.auth.user}
+            user={auth.user}
             header={
                 <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Create Tickets
+                    Create Ticket
                 </h2>
             }
         >
-            <Head title={"Create Tickets"} />
-
+            <Head title="Create Ticket" />
             <Container>
-                <Card title="Create Ticket">
-                    <form onSubmit={handleCreateData}>
-                        {/*pilihan jenis tiket*/}
+                <Card title="Create New Ticket">
+                    <form onSubmit={handleStoreData}>
+                        {/* Pilihan jenis tiket */}
                         <div className="mb-4">
                             <label className="block font-medium text-sm text-gray-700">
                                 Ticket Type
@@ -59,7 +54,6 @@ export default function Create({ auth }) {
                                     setData("name", e.target.value)
                                 }
                             >
-                                <option value="">Select Ticket Type</option>
                                 <option value="Regular">Regular</option>
                                 <option value="VIP">VIP</option>
                             </select>
@@ -70,48 +64,38 @@ export default function Create({ auth }) {
                             )}
                         </div>
 
-                        {/*input harga tiket*/}
+                        {/* Input harga tiket */}
                         <div className="mb-4">
                             <Input
                                 label="Price (Rp)"
                                 type="number"
                                 value={data.price_per_pack}
                                 onChange={(e) =>
-                                    setData(
-                                        "price_per_pack",
-                                        e.target.value
-                                            ? parseFloat(e.target.value)
-                                            : ""
-                                    )
+                                    setData("price_per_pack", e.target.value)
                                 }
                                 errors={errors.price_per_pack}
                                 placeholder="Enter ticket price..."
                             />
                         </div>
 
-                        {/*input jumlah tiket*/}
+                        {/* Input jumlah tiket */}
                         <div className="mb-4">
                             <Input
-                                label="Qty"
+                                label="Quantity"
                                 type="number"
                                 value={data.qty}
-                                onChange={(e) =>
-                                    setData(
-                                        "qty",
-                                        e.target.value
-                                            ? parseInt(e.target.value)
-                                            : ""
-                                    )
-                                }
+                                onChange={(e) => setData("qty", e.target.value)}
                                 errors={errors.qty}
                                 placeholder="Enter ticket quantity..."
                             />
                         </div>
 
                         <div className="flex items-center gap-2">
-                            <Button type={"submit"}>save</Button>
-                            <Button type={"button"} url={route("tickets.index")}>
-                                cancel
+                            <Button type="submit" disabled={processing}>
+                                Save
+                            </Button>
+                            <Button type="cancel" url={route("tickets.index")}>
+                                Cancel
                             </Button>
                         </div>
                     </form>

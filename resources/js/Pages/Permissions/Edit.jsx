@@ -8,25 +8,25 @@ import Button from "@/Components/Button";
 import Card from "@/Components/Card";
 import Swal from "sweetalert2";
 
-export default function Edit({auth}) {
-    //destruct permission from usepage props
+export default function Edit({ auth }) {
+    // ambil permission dari inertia
     const { permission } = usePage().props;
 
-    //define state with helper inertia
-    const { data, setData, post, errors } = useForm({
-        name: permission.name,
+    // form state
+    const { data, setData, post, processing, errors } = useForm({
+        name: permission.name || "",
         _method: "put",
     });
 
-    //define method handleUpdateData
-    const handleUpdateData = async (e) => {
+    // handle update data
+    const handleUpdateData = (e) => {
         e.preventDefault();
 
         post(route("permissions.update", permission.id), {
             onSuccess: () => {
                 Swal.fire({
                     title: "Success",
-                    text: "Data update successfully!",
+                    text: "Data updated successfully!",
                     icon: "success",
                     showConfirmButton: false,
                     timer: 1500,
@@ -34,24 +34,25 @@ export default function Edit({auth}) {
             },
         });
     };
+
     return (
         <AuthenticatedLayout
-            user={auth.auth.user}
+            user={auth.user}
             header={
                 <h2 className="font-semibold text-xl text-gray-800 leading-tight">
                     Edit Permission
                 </h2>
             }
         >
-            <Head title={"Edit Permissions"} />
+            <Head title="Edit Permissions" />
 
             <Container>
                 <Card title="Edit permission">
                     <form onSubmit={handleUpdateData}>
                         <div className="mb-4">
                             <Input
-                                label={"Permission Name"}
-                                type={"text"}
+                                label="Permission Name"
+                                type="text"
                                 value={data.name}
                                 onChange={(e) =>
                                     setData("name", e.target.value)
@@ -61,10 +62,10 @@ export default function Edit({auth}) {
                             />
                         </div>
                         <div className="flex items-center gap-2">
-                            <Button type={"submit"} />
+                            <Button type="submit" disabled={processing} />
                             <Button
-                                type={"cancel"}
-                                url={route("Permissions.index")}
+                                type="cancel"
+                                url={route("permissions.index")}
                             />
                         </div>
                     </form>

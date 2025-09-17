@@ -32,13 +32,23 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
+
             'auth' => [
                 'user' => $request->user(),
-                'permissions' => $request->user() ? $request->user()->getUserPermission():[],
+
+                // REVISI: Ganti `getUserPermission()` menjadi `getPermissionNames()`
+                'permissions' => $request->user() ? $request->user()->getPermissionNames() : [],
             ],
-            'ziggy' => fn () => [
+
+            'ziggy' => fn() => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
+            ],
+
+            // Menambahkan flash message agar bisa diakses di semua halaman
+            'flash' => [
+                'success' => fn() => $request->session()->get('success'),
+                'error' => fn() => $request->session()->get('error'),
             ],
         ];
     }

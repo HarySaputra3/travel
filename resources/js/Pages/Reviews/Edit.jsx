@@ -1,5 +1,4 @@
 import React from "react";
-
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import Container from "@/Components/Container";
 import { Head, useForm, usePage } from "@inertiajs/react";
@@ -8,45 +7,40 @@ import Button from "@/Components/Button";
 import Card from "@/Components/Card";
 import Swal from "sweetalert2";
 
-const InteractiveRatingStars = ({ label, rating, max = 5, onChange }) => {
-    return (
-        <div className="mb-4">
-            <label className="block font-medium text-sm text-gray-700 mb-1">
-                {label}
-            </label>
-            <div className="flex gap-1">
-                {Array.from({ length: max }, (_, index) => {
-                    const starValue = index + 1;
-                    return (
-                        <span
-                            key={index}
-                            onClick={() => onChange(starValue)}
-                            className={`text-3xl cursor-pointer ${
-                                starValue <= rating
-                                    ? "text-yellow-400"
-                                    : "text-gray-300"
-                            }`}
-                        >
-                            *
-                        </span>
-                    );
-                })}
-                <span className="ml-2 text-gray-600 text-sm">
-                    ({rating}/{max})
-                </span>
-            </div>
+const InteractiveRatingStars = ({ label, rating, max = 5, onChange }) => (
+    <div className="mb-4">
+        <label className="block font-medium text-sm text-gray-700 mb-1">
+            {label}
+        </label>
+        <div className="flex items-center gap-1">
+            {Array.from({ length: max }, (_, index) => {
+                const starValue = index + 1;
+                return (
+                    <span
+                        key={index}
+                        onClick={() => onChange(starValue)}
+                        className={`text-3xl cursor-pointer transition-colors ${
+                            starValue <= rating
+                                ? "text-yellow-400"
+                                : "text-gray-300 hover:text-yellow-200"
+                        }`}
+                        style={{ marginTop: "-5px" }}
+                    >
+                        ★
+                    </span>
+                );
+            })}
+            <span className="ml-2 text-gray-600 text-sm">
+                ({rating}/{max})
+            </span>
         </div>
-    );
-};
+    </div>
+);
 
 export default function Edit({ auth }) {
-    //destruct review from usepage props
-    const { review, locations, transaction } = usePage().props;
+    const { review } = usePage().props;
 
-    //define state with helper inertia
     const { data, setData, put, errors } = useForm({
-        location_id: review.location_id,
-        transaction_id: review.transaction_id,
         review: review.review,
         rate_kebersihan: review.rate_kebersihan,
         rate_keakuratan: review.rate_keakuratan,
@@ -54,87 +48,43 @@ export default function Edit({ auth }) {
         rate_komunikasi: review.rate_komunikasi,
         rate_lokasi: review.rate_lokasi,
         rate_nilaiekonomis: review.rate_nilaiekonomis,
-        _method: "put",
     });
 
-    //define method handleUpdate
-    const handleUpdate = async (e) => {
+    const handleUpdate = (e) => {
         e.preventDefault();
-
-        post(route("reviews.update", review.id), {
-            onSuccess: () => {
+        put(route("reviews.update", review.id), {
+            onSuccess: () =>
                 Swal.fire({
                     title: "Success",
-                    text: "Data update successfully!",
+                    text: "Review updated successfully!",
                     icon: "success",
                     showConfirmButton: false,
                     timer: 1500,
-                });
-            },
+                }),
         });
     };
 
-    const selectedLocation = location.find(
-        (location) => location.id == data.location_id
-    );
-    const selectedTransaction = transactions.find(
-        (transaction) => transaction.id == data.transaction_id
-    );
-
     return (
         <AuthenticatedLayout
-            user={auth.auth.user}
+            user={auth.user}
             header={
                 <h2 className="font-semibold text-xl text-gray-800 leading-tight">
                     Edit Review
                 </h2>
             }
         >
-            <Head title={"Edit Reviews"} />
-
+            <Head title={"Edit Review"} />
             <Container>
-                <Card title="Edit Review">
+                <Card title={`Edit Review for ${review.location.title}`}>
                     <form onSubmit={handleUpdate}>
                         <div className="mb-4">
                             <label className="block font-medium text-sm text-gray-700">
-                                User
+                                Transaction Code
                             </label>
                             <input
                                 type="text"
                                 className="w-full border-gray-300 rounded-md shadow-sm bg-gray-100"
-                                value={auth.user.name}
-                                disabled
-                            />
-                        </div>
-
-                        <div className="mb-4">
-                            <label className="block font-medium text-sm text-gray-700">
-                                Location
-                            </label>
-                            <input
-                                type="text"
-                                className="w-full border-gray-300 rounded-md shadow-sm bg-gray-100"
-                                value={
-                                    selectedLocation
-                                        ? selectedLocation.title
-                                        : "Unknown"
-                                }
-                                disabled
-                            />
-                        </div>
-
-                        <div className="mb-4">
-                            <label className="block font-medium text-sm text-gray-700">
-                                Transaction
-                            </label>
-                            <input
-                                type="text"
-                                className="w-full border-gray-300 rounded-md shadow-sm bg-gray-100"
-                                value={
-                                    selectedTransaction
-                                        ? selectedTransaction.code
-                                        : "Unknown"
-                                }
+                                value={review.transaction.code}
                                 disabled
                             />
                         </div>
@@ -172,14 +122,26 @@ export default function Edit({ auth }) {
                             }
                         />
 
+                        <div className="mb-4">
+                            <Input
+                                label="Review"
+                                type="textarea"
+                                value={data.review}
+                                onChange={(e) =>
+                                    setData("review", e.target.value)
+                                }
+                                errors={errors.review}
+                                placeholder="Write your review..."
+                            />
+                        </div>
+
                         <div className="flex items-center gap-2">
-                            <Button type={"submit"}>Update</Button>
+                            <Button type={"submit"} label="Update" />
                             <Button
                                 type={"cancel"}
+                                label="Cancel"
                                 url={route("reviews.index")}
-                            >
-                                Cancel
-                            </Button>
+                            />
                         </div>
                     </form>
                 </Card>

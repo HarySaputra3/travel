@@ -5,19 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Locations extends Model
 {
     use HasFactory;
     protected $table = 'locations';
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'image',
         'title',
         'description',
-        'officehour',
+        'officehours', // FIX: 'officehour' diubah menjadi 'officehours' (PENYEBAB ERROR UTAMA)
         'category_id',
-        'region_id',
+        'ticket_id',
         'phone',
         'address',
         'latitude',
@@ -26,38 +32,47 @@ class Locations extends Model
 
     protected $appends = ['image_urls'];
 
-    public function getImageUrlsAttribute ()
+    /**
+     * Accessor for image URLs.
+     *
+     * @return array
+     */
+    public function getImageUrlsAttribute(): array
     {
-        if ($this->image){
-            return[];
+        // FIX: Logika dibalik, kembalikan array kosong jika TIDAK ADA gambar
+        if (!$this->image) {
+            return [];
         }
 
-        return array_map (function($image){
-            return asset('storage/'. $image);
+        return array_map(function ($image) {
+            return asset('storage/' . $image);
         }, explode('|', $this->image));
     }
 
-    public function category(){
-        return $this->BelongsTo(Categories::class, 'category_id');
+    /**
+     * Get the category that owns the location.
+     */
+    public function category(): BelongsTo
+    {
+        // FIX: 'BelongsTo' diubah menjadi 'belongsTo' (camelCase)
+        return $this->belongsTo(Categories::class, 'category_id');
     }
 
-    public function ticket (){
-        return $this->belongsToMany(Ticket::class, 'location_ticket', 'location_id', 'ticket_id')
-        ->withPivot('ticket_category_id')
-        ->withTimestamps();
+    /**
+     * Get the ticket associated with the location.
+     * PENTING: Pilih Opsi A atau Opsi B di atas yang sesuai dengan database Anda.
+     * Kode ini menggunakan Opsi B agar konsisten dengan controller.
+     */
+    public function ticket(): BelongsTo
+    {
+        return $this->belongsTo(Ticket::class, 'ticket_id');
     }
 
-    public function reviews (){
+    /**
+     * Get the reviews for the location.
+     */
+    public function reviews(): HasMany
+    {
         return $this->hasMany(Reviews::class, 'location_id');
-    }
-
-    public function getTicketGroupByCategory(){
-        return $this->tickets->grouptby(function($ticket){
-            return $ticket->pivot->ticket_category_id;
-        });
-    }
-
-    public function region (){
-        return $this->belongsTo(Region::class);
     }
 }

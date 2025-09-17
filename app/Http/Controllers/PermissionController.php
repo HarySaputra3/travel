@@ -53,7 +53,8 @@ class PermissionController extends Controller implements HasMiddleware
         Permission::create(['name' => $request->name]);
 
         //render view
-        return to_route('Permissions\index');
+        return to_route('permissions.index');
+
     }
 
     /**
@@ -78,7 +79,10 @@ class PermissionController extends Controller implements HasMiddleware
     public function update(Request $request, Permission $permission)
     {
         //validate request
-        $request->validate(['name' => 'required|min:3|max:255|unique:permissions,name' . $permission->id]);
+        $request->validate([
+            'name' => 'required|min:3|max:255|unique:permissions,name,' . $permission->id
+        ]);
+
 
         //update permissions data
         $permission->update(['name' => $request->name]);

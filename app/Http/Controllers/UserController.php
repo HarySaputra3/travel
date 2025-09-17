@@ -42,7 +42,9 @@ class UserController extends Controller implements HasMiddleware
         $roles = Role::latest()->get();
 
         //render view
-        return inertia('Users/Create', ['roles', $roles]);
+        return inertia('Users/Create', [
+            'roles' => $roles,
+        ]);
     }
 
     /**
@@ -105,7 +107,7 @@ class UserController extends Controller implements HasMiddleware
         //validate request
         $request->validate([
             'name' => 'required|min:3|max:255',
-            'email' => 'required|email|unique:users'.$user->id,
+            'email' => 'required|email|unique:users,email,' . $user->id,
             'phone' => 'required',
             'selectedRoles' => 'required|array|min:1',
         ]);
@@ -117,7 +119,6 @@ class UserController extends Controller implements HasMiddleware
             'email' => $request->email,
             'phone' => $request->phone,
         ]);
-
         //attach roles
         $user->syncRoles($request->selectedRoles);
 

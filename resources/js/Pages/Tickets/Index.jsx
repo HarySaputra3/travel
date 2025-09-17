@@ -1,5 +1,4 @@
 import React from "react";
-
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import Container from "@/Components/Container";
 import Table from "@/Components/Table";
@@ -10,7 +9,6 @@ import Search from "@/Components/Search";
 import hasAnyPermission from "@/Utils/Permissions";
 
 export default function Index({ auth }) {
-    //Destruct tickets dan filters props
     const { tickets, filters } = usePage().props;
     return (
         <AuthenticatedLayout
@@ -27,17 +25,16 @@ export default function Index({ auth }) {
                     {hasAnyPermission(["tickets create"]) && (
                         <Button type="add" url={route("tickets.create")} />
                     )}
-
-                    <div className="w-full md:w-4.6">
+                    <div className="w-full md:w-4/6">
                         <Search
                             url={route("tickets.index")}
-                            placeholder="Search tickets data by name..."
+                            placeholder="Search tickets data by code..."
                             filters={filters}
                         />
                     </div>
                 </div>
 
-                <Table.Card title={"tickets"}>
+                <Table.Card title={"Tickets"}>
                     <Table>
                         <Table.Thead>
                             <tr>
@@ -60,7 +57,11 @@ export default function Index({ auth }) {
                                     </Table.Td>
                                     <Table.Td>{ticket.ticket_code}</Table.Td>
                                     <Table.Td>{ticket.name}</Table.Td>
-                                    <Table.Td>Rp.{ticket.ticket_per_pack.toLocaleString()}</Table.Td>
+                                    {/* FIX: Nama properti harga salah */}
+                                    <Table.Td>
+                                        Rp.
+                                        {ticket.price_per_pack.toLocaleString()}
+                                    </Table.Td>
                                     <Table.Td>{ticket.qty}</Table.Td>
                                     <Table.Td>
                                         <div className="flex items-center gap-2">
@@ -80,8 +81,9 @@ export default function Index({ auth }) {
                                             ]) && (
                                                 <Button
                                                     type={"delete"}
+                                                    // FIX: Route untuk delete salah
                                                     url={route(
-                                                        "tickets.create",
+                                                        "tickets.destroy",
                                                         ticket.id
                                                     )}
                                                 />
