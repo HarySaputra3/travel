@@ -5,7 +5,7 @@ export default function Textarea({label, className, errors, ...props}) {
         <label className="text-gray-600 dark:text-gray-500 text-sm">
             {label}
         </label>
-        <textarea className={`w-full px-4 py-2 border text-sm rounded-md focus:outline-none focus:ring-0 bg-white text-gray-700 focus:border-gray-200 border-gray-200 ${className}`}
+        <textarea className={`w-full px-4 py-2 border text-sm rounded-md focus:outline-hidden focus:ring-0 bg-white text-gray-700 focus:border-gray-200 border-gray-200 ${className}`}
         {...props}
         />
         err

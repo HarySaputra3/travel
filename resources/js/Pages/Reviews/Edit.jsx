@@ -83,7 +83,7 @@ export default function Edit({ auth }) {
                             </label>
                             <input
                                 type="text"
-                                className="w-full border-gray-300 rounded-md shadow-sm bg-gray-100"
+                                className="w-full border-gray-300 rounded-md shadow-xs bg-gray-100"
                                 value={review.transaction.code}
                                 disabled
                             />

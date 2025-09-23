@@ -120,7 +120,7 @@ export default function Create({ auth }) {
                             onChange={(e) =>
                                 setData("category_id", e.target.value)
                             }
-                            className="w-full p-2 border rounded"
+                            className="w-full p-2 border rounded-sm"
                         >
                             <option value="">Select Category</option>
                             {categories.map((category) => (
@@ -141,7 +141,7 @@ export default function Create({ auth }) {
                             onChange={(e) =>
                                 setData("ticket_id", e.target.value)
                             }
-                            className="w-full p-2 border rounded"
+                            className="w-full p-2 border rounded-sm"
                         >
                             <option value="">Select Ticket</option>
                             {tickets.map((ticket) => (

@@ -99,7 +99,7 @@ export default function Create({ auth }) {
                                 Transaction
                             </label>
                             <select
-                                className="w-full border-gray-300 rounded-md shadow-sm"
+                                className="w-full border-gray-300 rounded-md shadow-xs"
                                 value={data.transaction_id}
                                 onChange={handleTransactionChange}
                             >

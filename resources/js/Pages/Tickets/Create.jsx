@@ -48,7 +48,7 @@ export default function Create({ auth }) {
                                 Ticket Type
                             </label>
                             <select
-                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-xs focus:border-blue-300 focus:ring-3 focus:ring-blue-200 focus:ring-opacity-50"
                                 value={data.name}
                                 onChange={(e) =>
                                     setData("name", e.target.value)
