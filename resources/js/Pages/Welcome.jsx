@@ -1,6 +1,6 @@
 import Navbar from "@/Components/ui/Navbar";
 import { Head } from "@inertiajs/react";
-import { categories } from "@/Utils/constants";
+import { optionsCategories, categories } from "@/Utils/constants"; // ✅ import categories juga
 import { useState } from "react";
 
 export default function Welcome({ auth }) {
@@ -45,19 +45,21 @@ export default function Welcome({ auth }) {
                 </section>
 
                 <main className="container mx-auto grid md:grid-cols-3 grid-cols-1 gap-12 my-32 px-4">
-                  {categories.map((category, index)=>{
-                    <div key={index} className="relative flex flex-col">
-                        <img
-                            src={category.thumbnail}
-                            alt={category.name}
-                            className="w-full"
-                            draggable="false"
-                        />
-                        <p className={`text-xl md:text-2xl px-7 py-2.5 rounded-full bg-xgreen ${category.color} absolute top-4 left-4 text-white font-semibold`}>
-                            {category.name}
-                        </p>
-                    </div>;
-                  })}
+                    {categories.map((category, index) => (
+                        <div key={index} className="relative flex flex-col">
+                            <img
+                                src={category.thumbnail}
+                                alt={category.name}
+                                className="w-full"
+                                draggable="false"
+                            />
+                            <p
+                                className={`text-xl md:text-2xl px-7 py-2.5 rounded-full ${category.color} absolute top-4 left-4 text-white font-semibold`}
+                            >
+                                {category.name}
+                            </p>
+                        </div>
+                    ))}
                 </main>
             </div>
         </>

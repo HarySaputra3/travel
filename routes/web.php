@@ -20,7 +20,19 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-});
+})->name('home');
+
+Route::get('location', function () {
+    return Inertia::render('Location');
+})->name('location');
+
+Route::get('maps', function () {
+    return Inertia::render('Maps');
+})->name('maps');
+
+Route::get('location/{id}', function () {
+    return Inertia::render('Details');
+})->name('details');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
@@ -29,7 +41,7 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     //permission route
     Route::resource('/permissions', PermissionController::class);
-    
+
     //roles route
     Route::resource('/roles', RoleController::class)->except('show');
 
@@ -57,4 +69,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
